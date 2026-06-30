@@ -1,0 +1,7 @@
+node_modules/
+dist/
+__pycache__/
+*.pyc
+backend/data/ev_platform.db
+venv/
+.DS_Store
