@@ -3,8 +3,8 @@ from fastapi import APIRouter, UploadFile, File, HTTPException
 import io
 import pandas as pd
 
-from analytics import engine
-from database.db import get_connection, clean_dataframe
+from backend.analytics import engine
+from backend.database.db import get_connection, clean_dataframe
 
 router = APIRouter()
 

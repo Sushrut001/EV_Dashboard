@@ -6,7 +6,7 @@ layer makes the logic easy to test and reuse.
 """
 import pandas as pd
 import numpy as np
-from database.db import get_connection
+from backend.database.db import get_connection
 
 CALENDAR_DAYS_ASSUMED = 30  # window used for utilization & "per day" denominators
 
