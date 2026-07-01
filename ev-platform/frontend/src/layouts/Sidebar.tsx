@@ -11,6 +11,8 @@ const NAV_ITEMS = [
   { to: "/upload", label: "Upload Data", icon: Upload },
 ];
 
+
+
 export function EVLogo({ size = 36 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 64 64" fill="none">
@@ -29,7 +31,7 @@ export function Sidebar() {
   return (
     <aside className="hidden w-64 shrink-0 flex-col border-r border-border/60 bg-card px-4 py-6 dark:border-border-dark/60 dark:bg-card-dark md:flex">
       <div className="mb-8 flex items-center gap-2.5 px-2">
-        <EVLogo size={34} fillColor="#34C759" bodyColor="#000000" boltColor="#FFFFFF" />
+        <EVLogo size={24} />
         <div>
           <p className="text-sm font-bold leading-tight text-ink dark:text-ink-dark">EV Intelligence</p>
           <p className="text-xs leading-tight text-muted dark:text-muted-dark">Charging Platform</p>
