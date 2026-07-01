@@ -2,7 +2,7 @@ import type {
   KPISummary, StationStat, MapStation, ChartPoint, Insight, UploadResult,
 } from "../types";
 
-const BASE_URL = "http://localhost:8000/api";
+const BASE_URL = "https://ev-dashboard-02n1.onrender.com/api";
 
 async function getJSON<T>(path: string): Promise<T> {
   const res = await fetch(`${BASE_URL}${path}`);
