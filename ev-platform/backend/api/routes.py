@@ -108,6 +108,8 @@ async def upload_csv(file: UploadFile = File(...)):
     conn.commit()
     conn.close()
 
+    engine.load_sessions_df(force_reload=True)
+
     return {
         "filename": file.filename,
         "rows_received": rows_before,
