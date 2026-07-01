@@ -107,13 +107,6 @@ async def upload_csv(file: UploadFile = File(...)):
     df.to_sql("charging_sessions", conn, if_exists="append", index=False)
     conn.commit()
     conn.close()
-
+    
     engine.load_sessions_df(force_reload=True)
-
-    return {
-        "filename": file.filename,
-        "rows_received": rows_before,
-        "rows_stored": rows_after,
-        "rows_removed": rows_before - rows_after,
-        "message": "Dataset uploaded and processed successfully.",
-    }
+ 
