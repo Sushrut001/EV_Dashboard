@@ -7,7 +7,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pathlib import Path
 
-from database.db import init_db, load_csv_into_db, get_connection
+from backend.database.db import init_db, load_csv_into_db, get_connection
 from api.routes import router
 
 app = FastAPI(title="EV Charging Station Intelligence Platform", version="1.0.0")
