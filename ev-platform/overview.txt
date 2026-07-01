@@ -1,0 +1,112 @@
+# ⚡ EV Charging Station Intelligence Platform
+
+> Full-stack data analytics platform for EV charging network operators.
+---
+
+## 📌 Overview
+
+| Field | Details |
+|---|---|
+| **Type** | Full-Stack Data Analytics Web App |
+| **City** | Pune, Maharashtra |
+| **Data** | 57,000+ sessions · 50 stations · Jan–Dec 2024 |
+| **Repo** | github.com/Sushrut001/EV_Dashboard |
+| **Deployed on** | Render |
+
+---
+
+## 🛠️ Tech Stack — What & Why
+
+### 🖥️ Frontend
+
+| Tool | Why it's used |
+|---|---|
+| **React** | Build the entire UI as reusable components — KPI cards, charts, sidebar, map all are React components |
+| **TypeScript** | Catches bugs before runtime — e.g. if API returns wrong data type, TypeScript warns instantly |
+| **Tailwind CSS** | Write styling directly in HTML without creating separate CSS files — speeds up UI development |
+| **Recharts** | Renders all 6 business charts (bar, line, area) — built specifically for React, easy to customize |
+| **React Leaflet** | Displays the interactive Pune map with clickable station markers — uses real GPS coordinates |
+| **Vite** | Starts the frontend dev server in under 1 second and builds the final production bundle |
+
+### ⚙️ Backend
+
+| Tool | Why it's used |
+|---|---|
+| **Python** | Best language for data analytics — huge ecosystem of data libraries |
+| **FastAPI** | Creates all REST API endpoints — fastest Python web framework, auto-generates `/docs` page |
+| **Uvicorn** | The server that actually runs FastAPI — handles incoming HTTP requests |
+| **Pandas** | Does all the heavy analytics — calculates KPIs, utilization, monthly trends, peak hours from raw CSV data |
+| **NumPy** | Handles numerical operations used inside Pandas calculations |
+| **Pydantic** | Validates every API response — ensures frontend always gets data in the correct format |
+| **SQLite** | Stores all charging session data in a local database file — no external database server needed |
+| **python-multipart** | Handles the CSV file upload from the frontend drag-and-drop feature |
+
+### 🚀 DevOps & Tools
+
+| Tool | Why it's used |
+|---|---|
+| **Git** | Tracks every code change with history — can roll back if something breaks |
+| **GitHub** | Hosts the code online — Render pulls directly from here to deploy |
+| **Render** | Free cloud platform — hosts both the FastAPI backend and React frontend live on the internet |
+| **npm** | Installs all frontend packages (React, Recharts etc.) from one command |
+| **pip + venv** | Installs all Python packages in an isolated environment so nothing conflicts |
+
+---
+
+## 📱 Features
+
+| Page | What it does |
+|---|---|
+| **Dashboard** | 6 KPI cards + Daily Sessions chart + Peak Hours chart |
+| **Station Analytics** | Ranked table — sessions, energy, utilization per station |
+| **Map** | Live interactive map with all 50 Pune station markers |
+| **Analytics** | 6 business charts — monthly trends, peak hours, energy, utilization |
+| **Insights** | Auto-generated plain-language business observations |
+| **CSV Upload** | Drag and drop new dataset — backend validates and reloads DB |
+
+---
+
+## 🏗️ How it all connects
+
+```
+User opens browser
+       ↓
+React (Frontend) — shows the UI
+       ↓  sends API request
+FastAPI (Backend) — receives the request
+       ↓  queries data
+SQLite Database — returns raw rows
+       ↓  processes with
+Pandas + NumPy — calculates KPIs, charts, insights
+       ↓  sends back as JSON
+React — renders charts, cards, map
+```
+
+---
+
+## 📦 Dataset
+
+| Property | Details |
+|---|---|
+| Total Sessions | 57,048 |
+| Stations | 50 real Pune locations |
+| Period | January – December 2024 |
+| Operators | ChargeZone, Tata Power EZ, Ather Grid, BPCL EV, HPCL EV, Jio-BP EV, MG EV Hub |
+| Vehicles | Tata Nexon EV, MG ZS EV, Hyundai Kona, BYD Atto 3, Ather 450X, Ola S1 Pro + more |
+| Chargers | DC Fast + AC Level 2 |
+
+---
+
+## 💡 Key Technical Decisions
+
+| Decision | Why |
+|---|---|
+| No caching layer | Keeps code simple — all analytics computed live from SQLite via Pandas |
+| SQLite over PostgreSQL | No external server needed — file-based DB is enough for this scale |
+| Pydantic schemas | Guarantees type-safe API responses between Python backend and TypeScript frontend |
+| Vite over CRA | 10x faster dev server startup than Create React App |
+| Recharts over Chart.js | Native React support — no manual DOM manipulation needed |
+
+---
+
+*Built by Sushrut · Pune, Maharashtra*
