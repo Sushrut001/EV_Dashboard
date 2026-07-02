@@ -1,6 +1,7 @@
 """All REST API routes for the EV Charging Intelligence Platform."""
 from fastapi import APIRouter, UploadFile, File, HTTPException
 import io
+import traceback
 import pandas as pd
 
 from backend.analytics import engine
@@ -9,22 +10,39 @@ from backend.database.db import get_connection, clean_dataframe
 router = APIRouter()
 
 
+def _safe_call(fn, *args, **kwargs):
+    """TEMPORARY DEBUG WRAPPER: runs fn and, if it crashes, returns the real
+    Python error + traceback as JSON instead of a blank 500. Remove this
+    once everything is confirmed working."""
+    try:
+        return fn(*args, **kwargs)
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail={
+                "error": str(e),
+                "type": type(e).__name__,
+                "traceback": traceback.format_exc().splitlines(),
+            },
+        )
+
+
 @router.get("/kpis")
 def kpis():
     df = engine.load_sessions_df()
-    return engine.get_kpis(df)
+    return _safe_call(engine.get_kpis, df)
 
 
 @router.get("/stations")
 def stations():
     df = engine.load_sessions_df()
-    return engine.get_station_stats(df)
+    return _safe_call(engine.get_station_stats, df)
 
 
 @router.get("/map")
 def map_data():
     df = engine.load_sessions_df()
-    stats = engine.get_station_stats(df)
+    stats = _safe_call(engine.get_station_stats, df)
     return [
         {
             "station_id": s["station_id"],
@@ -44,43 +62,43 @@ def map_data():
 @router.get("/charts/daily-sessions")
 def chart_daily_sessions():
     df = engine.load_sessions_df()
-    return engine.get_daily_sessions(df)
+    return _safe_call(engine.get_daily_sessions, df)
 
 
 @router.get("/charts/monthly-trends")
 def chart_monthly_trends():
     df = engine.load_sessions_df()
-    return engine.get_monthly_trends(df)
+    return _safe_call(engine.get_monthly_trends, df)
 
 
 @router.get("/charts/peak-hours")
 def chart_peak_hours():
     df = engine.load_sessions_df()
-    return engine.get_peak_hours(df)
+    return _safe_call(engine.get_peak_hours, df)
 
 
 @router.get("/charts/day-of-week")
 def chart_day_of_week():
     df = engine.load_sessions_df()
-    return engine.get_day_of_week_usage(df)
+    return _safe_call(engine.get_day_of_week_usage, df)
 
 
 @router.get("/charts/energy-consumption")
 def chart_energy_consumption():
     df = engine.load_sessions_df()
-    return engine.get_energy_consumption(df)
+    return _safe_call(engine.get_energy_consumption, df)
 
 
 @router.get("/charts/station-utilization")
 def chart_station_utilization():
     df = engine.load_sessions_df()
-    return engine.get_station_utilization_chart(df)
+    return _safe_call(engine.get_station_utilization_chart, df)
 
 
 @router.get("/insights")
 def insights():
     df = engine.load_sessions_df()
-    return engine.generate_insights(df)
+    return _safe_call(engine.generate_insights, df)
 
 
 @router.post("/upload")
@@ -94,19 +112,16 @@ async def upload_csv(file: UploadFile = File(...)):
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Could not parse CSV: {e}")
 
-    rows_before = len(df)
     try:
         df = clean_dataframe(df)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
-
-    rows_after = len(df)
 
     conn = get_connection()
     conn.execute("DELETE FROM charging_sessions")
     df.to_sql("charging_sessions", conn, if_exists="append", index=False)
     conn.commit()
     conn.close()
-    
+
     engine.load_sessions_df(force_reload=True)
- 
+    return {"status": "ok", "rows_loaded": len(df)}
