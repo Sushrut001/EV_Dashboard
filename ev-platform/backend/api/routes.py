@@ -1,6 +1,7 @@
 """All REST API routes for the EV Charging Intelligence Platform."""
 from fastapi import APIRouter, UploadFile, File, HTTPException
 import io
+import traceback
 import pandas as pd
 
 from backend.analytics import engine
@@ -11,8 +12,18 @@ router = APIRouter()
 
 @router.get("/kpis")
 def kpis():
-    df = engine.load_sessions_df()
-    return engine.get_kpis(df)
+    try:
+        df = engine.load_sessions_df()
+        return engine.get_kpis(df)
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail={
+                "error": str(e),
+                "type": type(e).__name__,
+                "traceback": traceback.format_exc().splitlines(),
+            },
+        )
 
 
 @router.get("/stations")
