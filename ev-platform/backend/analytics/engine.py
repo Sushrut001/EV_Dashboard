@@ -39,14 +39,13 @@ def load_sessions_df(force_reload=False):
 
 
 def _utilization_for_group(group: pd.DataFrame, chargers: int, days_span: int) -> float:
-    
     """
     Utilization % = (total charging hours used) / (total available charger-hours) * 100
     over the observed date span for that station.
     """
     if chargers <= 0 or days_span <= 0:
         return 0.0
-    used_hours = group["duration_minutes"].sum() / 60
+    used_hours = float(group["duration_minutes"].sum()) / 60
     available_hours = chargers * 24 * days_span
     return round(min(100.0, (used_hours / available_hours) * 100), 1)
 
@@ -70,10 +69,10 @@ def get_kpis(df: pd.DataFrame) -> dict:
         }
 
     recent = _recent_window(df, 30)
-    total_sessions = len(recent)
-    total_energy = round(recent["energy_kwh"].sum(), 1)
-    active_stations = recent["station_id"].nunique()
-    avg_duration = round(recent["duration_minutes"].mean(), 1)
+    total_sessions = int(len(recent))
+    total_energy = round(float(recent["energy_kwh"].sum()), 1)
+    active_stations = int(recent["station_id"].nunique())
+    avg_duration = round(float(recent["duration_minutes"].mean()), 1)
     peak_hour = int(recent.groupby("hour").size().idxmax())
 
     days_span = max(1, (recent["start_time"].max() - recent["start_time"].min()).days + 1)
@@ -95,7 +94,7 @@ def get_kpis(df: pd.DataFrame) -> dict:
         return round(((new - old) / old) * 100, 1)
 
     sessions_trend = pct_change(len(recent), len(prior))
-    energy_trend = pct_change(recent["energy_kwh"].sum(), prior["energy_kwh"].sum())
+    energy_trend = pct_change(float(recent["energy_kwh"].sum()), float(prior["energy_kwh"].sum()))
 
     return {
         "total_sessions": total_sessions,
@@ -118,15 +117,15 @@ def get_station_stats(df: pd.DataFrame) -> list:
     rows = []
     for sid, group in df.groupby("station_id"):
         chargers = int(group["total_chargers"].iloc[0])
-        sessions = len(group)
-        energy = round(group["energy_kwh"].sum(), 1)
-        avg_duration = round(group["duration_minutes"].mean(), 1)
+        sessions = int(len(group))
+        energy = round(float(group["energy_kwh"].sum()), 1)
+        avg_duration = round(float(group["duration_minutes"].mean()), 1)
         utilization = _utilization_for_group(group, chargers, days_span)
         avg_per_day = round(sessions / days_span, 1)
 
         rows.append({
-            "station_id": sid,
-            "station_name": group["station_name"].iloc[0],
+            "station_id": str(sid),
+            "station_name": str(group["station_name"].iloc[0]),
             "latitude": float(group["latitude"].iloc[0]),
             "longitude": float(group["longitude"].iloc[0]),
             "total_chargers": chargers,
@@ -164,7 +163,7 @@ def get_monthly_trends(df: pd.DataFrame) -> list:
     monthly = df.groupby("month").agg(sessions=("session_id", "count"), energy=("energy_kwh", "sum")).reset_index()
     monthly = monthly.sort_values("month")
     return [
-        {"label": m, "value": int(s), "secondary": round(float(e), 1)}
+        {"label": str(m), "value": int(s), "secondary": round(float(e), 1)}
         for m, s, e in zip(monthly["month"], monthly["sessions"], monthly["energy"])
     ]
 
@@ -183,7 +182,7 @@ def get_day_of_week_usage(df: pd.DataFrame) -> list:
     order = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
     grouped = df.groupby("weekday").size().reindex(order, fill_value=0).reset_index(name="value")
     grouped.columns = ["weekday", "value"]
-    return [{"label": w[:3], "value": int(v)} for w, v in zip(grouped["weekday"], grouped["value"])]
+    return [{"label": str(w)[:3], "value": int(v)} for w, v in zip(grouped["weekday"], grouped["value"])]
 
 
 def get_energy_consumption(df: pd.DataFrame, last_n_days: int = 30) -> list:
@@ -231,7 +230,7 @@ def generate_insights(df: pd.DataFrame) -> list:
     if not hourly.empty:
         peak_hour = int(hourly.idxmax())
         period = "evening" if 17 <= peak_hour <= 21 else ("morning" if 6 <= peak_hour <= 10 else "off-peak")
-        share = round(hourly.max() / hourly.sum() * 100, 1)
+        share = round(float(hourly.max()) / float(hourly.sum()) * 100, 1)
         insights.append({
             "type": "neutral",
             "title": f"Demand peaks at {peak_hour:02d}:00",
@@ -239,8 +238,8 @@ def generate_insights(df: pd.DataFrame) -> list:
         })
 
     # weekend vs weekday
-    weekend_avg = df[df["is_weekend"]].groupby("date").size().mean() if df["is_weekend"].any() else 0
-    weekday_avg = df[~df["is_weekend"]].groupby("date").size().mean() if (~df["is_weekend"]).any() else 0
+    weekend_avg = float(df[df["is_weekend"]].groupby("date").size().mean()) if df["is_weekend"].any() else 0
+    weekday_avg = float(df[~df["is_weekend"]].groupby("date").size().mean()) if (~df["is_weekend"]).any() else 0
     if weekday_avg and weekend_avg:
         diff_pct = round(((weekend_avg - weekday_avg) / weekday_avg) * 100, 1)
         if abs(diff_pct) >= 10:
@@ -264,7 +263,7 @@ def generate_insights(df: pd.DataFrame) -> list:
     # charger type popularity (if column exists)
     if "charger_type" in df.columns and df["charger_type"].notna().any():
         top_type = df["charger_type"].value_counts().idxmax()
-        share = round(df["charger_type"].value_counts(normalize=True).max() * 100, 1)
+        share = round(float(df["charger_type"].value_counts(normalize=True).max()) * 100, 1)
         insights.append({
             "type": "neutral",
             "title": f"{top_type} is the most-used charger type",
