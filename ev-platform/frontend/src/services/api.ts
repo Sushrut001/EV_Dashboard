@@ -4,7 +4,7 @@ import type {
 
 const BASE_URL = import.meta.env.DEV
   ? "http://localhost:8000/api"
-  : "https://YOUR-NEW-BACKEND-URL.onrender.com/api";
+  : "https://ev-dashboard-yl11.onrender.com/api";
 
 async function getJSON<T>(path: string): Promise<T> {
   const res = await fetch(`${BASE_URL}${path}`);
