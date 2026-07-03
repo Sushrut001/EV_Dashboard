@@ -4,8 +4,8 @@ import io
 import traceback
 import pandas as pd
 
-from backend.analytics import engine
-from backend.database.db import get_connection, clean_dataframe
+from analytics import engine
+from database.db import get_connection, clean_dataframe
 
 router = APIRouter()
 
